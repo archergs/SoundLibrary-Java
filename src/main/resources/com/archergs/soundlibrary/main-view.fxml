@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.archergs.soundlibrary.SoundLibraryController">
+   <children>
+      <Label text="Step 1: SoundCloud URL" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="soundcloudURLTextBox" layoutX="34.0" layoutY="52.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="42.0" />
+      <Button fx:id="loadURLBtn" layoutX="523.0" layoutY="42.0" mnemonicParsing="false" onAction="#loadURL" text="Load URL" AnchorPane.rightAnchor="16.0" />
+      <Separator prefWidth="200.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="80.0" />
+      <Label text="Step 2: Download Tracks" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="96.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <ListView fx:id="trackListView" layoutX="16.0" layoutY="122.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="122.0" />
+      <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="286.0" layoutY="464.0" text="Welcome to SoundLibrary" textAlignment="CENTER" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" />
+      <Button fx:id="downloadTracksBtn" layoutX="515.0" layoutY="463.0" mnemonicParsing="false" onAction="#downloadFiles" text="Download" AnchorPane.bottomAnchor="12.0" AnchorPane.rightAnchor="16.0" />
+      <Button layoutX="14.0" layoutY="463.0" mnemonicParsing="false" onAction="#openTrackLocation" text="View Tracks" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0" />
+   </children>
+</AnchorPane>
