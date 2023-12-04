@@ -20,10 +20,10 @@ public class SoundLibraryApplication extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // create download dir if it isn't there already
         new File(System.getProperty("user.home") + "/SoundLibrary/").mkdirs();
 
         launch();
-    }
+    }*/
 }
