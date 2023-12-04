@@ -1,11 +1,16 @@
 package com.archergs.soundlibrary;
 
+import io.lindstrom.m3u8.model.MediaPlaylist;
+import io.lindstrom.m3u8.parser.MediaPlaylistParser;
+import io.lindstrom.m3u8.parser.ParsingMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundLibraryTrack {
 
@@ -14,6 +19,8 @@ public class SoundLibraryTrack {
     public String title;
     public String artist;
     public String downloadURLString;
+    public List<String> playlistURLs = new ArrayList<>();
+    public boolean isPlaylist = false;
     public String streamURLString;
     public String albumArtURLString;
     public int duration;
@@ -32,6 +39,11 @@ public class SoundLibraryTrack {
 
         this.downloadURLString = getDownloadURLString();
         System.out.println(this.downloadURLString);
+
+        if (this.downloadURLString.contains("playlist.m3u8")){
+            // this is a playlist. very annoying
+            isPlaylist = true;
+        }
 
         if (!json.isNull("artwork_url")){
             this.albumArtURLString = json.getString("artwork_url").replace("-large", "-t500x500");

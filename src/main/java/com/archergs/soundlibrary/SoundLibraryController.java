@@ -48,6 +48,11 @@ public class SoundLibraryController {
 
         JSONObject jsonObject = new JSONObject(response.get());
 
+        if (jsonObject.isNull("kind")){
+            statusLabel.setText("Generated playlists not supported!");
+            return;
+        }
+
         String responseKind = jsonObject.getString("kind");
 
         switch (responseKind){

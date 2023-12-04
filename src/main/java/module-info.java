@@ -9,6 +9,7 @@ module com.archergs.soundlibrary {
     requires org.json;
     requires java.desktop;
     requires mp3agic;
+    requires m3u8.parser;
 
     opens com.archergs.soundlibrary to javafx.fxml;
     exports com.archergs.soundlibrary;

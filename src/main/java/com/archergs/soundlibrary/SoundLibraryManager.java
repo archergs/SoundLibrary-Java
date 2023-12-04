@@ -5,15 +5,21 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.awt.Desktop;
 import com.mpatric.mp3agic.*;
+import io.lindstrom.m3u8.model.MediaPlaylist;
+import io.lindstrom.m3u8.model.MediaSegment;
+import io.lindstrom.m3u8.parser.MediaPlaylistParser;
+import io.lindstrom.m3u8.parser.ParsingMode;
 
 public class SoundLibraryManager {
 
     public static String clientID = "Hd4akujkPoaPv8SOUw6sqAySNno8EM7b";
-    public static String downloadLocation = System.getProperty("user.home") + "\\SoundLibrary\\";
+    public static File downloadLocation = new File(System.getProperty("user.home") + "/SoundLibrary/");
 
     public String resolveSoundcloudURL(String urlString){
         String apiURLString = "https://api-v2.soundcloud.com/resolve?client_id="+clientID+"&url=" + urlString;
@@ -74,9 +80,16 @@ public class SoundLibraryManager {
 
     public void downloadFile(SoundLibraryTrack track){
         String filename = removeIllegalCharacters(track.title, true);
-        File outputFile = new File(downloadLocation + filename + ".mp3.old");
+        File outputFile = null;
+
+        if (track.isPlaylist){
+            outputFile = new File(downloadLocation + "/" + filename + ".m3u8");
+        } else {
+            outputFile = new File(downloadLocation + "/" + filename + ".mp3.old");
+        }
 
         System.out.println("Downloading: " + outputFile);
+        System.out.println(track.downloadURLString);
 
         if (outputFile.exists()){
             System.out.println("file exists!");
@@ -99,12 +112,67 @@ public class SoundLibraryManager {
             fileOutputStream.close();
             in.close();
 
-            createFileMetadata(track, outputFile);
+            if (track.isPlaylist){
+                parsePlaylist(outputFile, track);
+            } else {
+                createFileMetadata(track, outputFile);
+            }
         } catch (Exception e) {
             // handle exception
             System.out.println(outputFile);
             e.printStackTrace();
         }
+    }
+
+    private void parsePlaylist(File playlistFile, SoundLibraryTrack track){
+        MediaPlaylistParser parser = new MediaPlaylistParser(ParsingMode.LENIENT);
+        try {
+            MediaPlaylist playlist = parser.readPlaylist(Path.of(playlistFile.getAbsolutePath()));
+
+            byte[] songSegments = new byte[0];
+
+            // download each song segment and stitch it together
+            for (MediaSegment segment : playlist.mediaSegments()) {
+                byte[] dataSegment = downloadPlaylistComponent(segment.uri());
+                if (dataSegment != null) {
+                    byte[] combined = new byte[songSegments.length + dataSegment.length];
+
+                    System.arraycopy(songSegments, 0, combined, 0, songSegments.length);
+                    System.arraycopy(dataSegment, 0, combined, songSegments.length, dataSegment.length);
+
+                    songSegments = combined;
+                }
+            }
+
+            // save stitched data to file
+            String filename = removeIllegalCharacters(track.title, true);
+            File outputFile = new File(downloadLocation + "/" + filename + ".mp3.old");
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            fileOutputStream.write(songSegments);
+            fileOutputStream.close();
+
+            // delete the playlist file
+            playlistFile.delete();
+
+            // add metadata
+            createFileMetadata(track, outputFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] downloadPlaylistComponent(String url){
+        try {
+            BufferedInputStream in = new BufferedInputStream(new URI(url).toURL().openStream());
+            byte[] data = in.readAllBytes();
+            in.close();
+
+            return data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private void createFileMetadata(SoundLibraryTrack track, File file) {
@@ -149,7 +217,7 @@ public class SoundLibraryManager {
 
     public void openTrackFileLocation(){
         try {
-            Desktop.getDesktop().open(new File(downloadLocation));
+            Desktop.getDesktop().open(downloadLocation);
         } catch (IOException exception) {
             System.out.println("Couldn't open download location!");
         }
